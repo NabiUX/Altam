@@ -1,0 +1,28 @@
+{
+  "name": "altam-videos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Animaciones estilo Apple para altam.io, renderizadas a video con Remotion",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render AltamAd out/altam-ad-dark.mp4",
+    "render:dark": "remotion render AltamAd out/altam-ad-dark.mp4",
+    "render:light": "remotion render AltamAdLight out/altam-ad-light.mp4",
+    "upgrade": "remotion upgrade"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@remotion/cli": "^4.0.506",
+    "@remotion/google-fonts": "^4.0.506",
+    "lucide-react": "^1.29.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.506",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "typescript": "^5.8.3"
+  }
+}
