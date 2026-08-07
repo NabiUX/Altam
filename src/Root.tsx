@@ -9,20 +9,26 @@ import {
   escalation,
 } from "./crm/mock/conversation";
 import { contact } from "./crm/mock/contact";
+import { Background } from "./components/Background";
+import { ScreenFrame } from "./components/ScreenFrame";
+import { getTheme } from "./theme";
 
-// Composición temporal: valida que Tailwind v4 aplica en los componentes del CRM.
+// Composición temporal: valida Tailwind v4 + el panel luminoso ScreenFrame.
 // Se elimina en Task 3.
 const TWCheck: React.FC = () => (
-  <AbsoluteFill style={{ width: 1920, height: 1080 }}>
-    <InboxScreen
-      conversations={conversationList}
-      activeConversation={activeConversation}
-      contact={contact}
-      messages={messages}
-      showEscalation
-      escalation={escalation}
-      typing={null}
-    />
+  <AbsoluteFill style={{ backgroundColor: getTheme("dark").bgTo }}>
+    <Background theme={getTheme("dark")} />
+    <ScreenFrame theme={getTheme("dark")} progress={1}>
+      <InboxScreen
+        conversations={conversationList}
+        activeConversation={activeConversation}
+        contact={contact}
+        messages={messages}
+        showEscalation
+        escalation={escalation}
+        typing={null}
+      />
+    </ScreenFrame>
   </AbsoluteFill>
 );
 
