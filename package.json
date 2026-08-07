@@ -8,6 +8,7 @@
     "render": "remotion render AltamAd out/altam-ad-dark.mp4",
     "render:dark": "remotion render AltamAd out/altam-ad-dark.mp4",
     "render:light": "remotion render AltamAdLight out/altam-ad-light.mp4",
+    "render:crm": "remotion render AltamCrmAd out/altam-crm-ad-dark.mp4",
     "upgrade": "remotion upgrade"
   },
   "license": "UNLICENSED",
