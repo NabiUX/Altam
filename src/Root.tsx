@@ -1,38 +1,9 @@
 import React from "react";
-import { AbsoluteFill, Composition } from "remotion";
+import { Composition } from "remotion";
 import { AltamAd } from "./AltamAd";
-import { InboxScreen } from "./crm/inbox/InboxScreen";
-import {
-  conversationList,
-  activeConversation,
-  messages,
-  escalation,
-} from "./crm/mock/conversation";
-import { contact } from "./crm/mock/contact";
-import { Background } from "./components/Background";
-import { ScreenFrame } from "./components/ScreenFrame";
-import { getTheme } from "./theme";
+import { AltamCrmAd } from "./AltamCrmAd";
 
-// Composición temporal: valida Tailwind v4 + el panel luminoso ScreenFrame.
-// Se elimina en Task 3.
-const TWCheck: React.FC = () => (
-  <AbsoluteFill style={{ backgroundColor: getTheme("dark").bgTo }}>
-    <Background theme={getTheme("dark")} />
-    <ScreenFrame theme={getTheme("dark")} progress={1}>
-      <InboxScreen
-        conversations={conversationList}
-        activeConversation={activeConversation}
-        contact={contact}
-        messages={messages}
-        showEscalation
-        escalation={escalation}
-        typing={null}
-      />
-    </ScreenFrame>
-  </AbsoluteFill>
-);
-
-// Config común: 15 segundos, 30fps, Full HD horizontal.
+// Config común del anuncio de 15s: 30fps, Full HD horizontal.
 const common = {
   component: AltamAd,
   durationInFrames: 450,
@@ -41,8 +12,6 @@ const common = {
   height: 1080,
 } as const;
 
-// Dos composiciones que comparten la misma plantilla, una por tema.
-// En Remotion Studio puedes cambiar entre ellas para ver claro vs oscuro.
 export const RemotionRoot: React.FC = () => {
   return (
     <>
@@ -56,13 +25,15 @@ export const RemotionRoot: React.FC = () => {
         {...common}
         defaultProps={{ theme: "light" as const }}
       />
+      {/* Anuncio del CRM (~60s) */}
       <Composition
-        id="TWCheck"
-        component={TWCheck}
-        durationInFrames={30}
+        id="AltamCrmAd"
+        component={AltamCrmAd}
+        durationInFrames={1800}
         fps={30}
         width={1920}
         height={1080}
+        defaultProps={{ theme: "dark" as const }}
       />
     </>
   );
