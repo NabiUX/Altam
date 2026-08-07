@@ -1,0 +1,70 @@
+/* ============================================================================
+ * theme.css — Tokens de diseño del CRM (extraídos de DASHBOARD/src/index.css)
+ * ----------------------------------------------------------------------------
+ * Importa este archivo UNA vez en tu proyecto Remotion (o en el CSS raíz).
+ * Define:
+ *   1. La paleta de marca --theme-50..950 (AZUL, color fijo del video).
+ *   2. Utilidades .bg-theme-* / .text-theme-* / .border-theme-* (igual que el dashboard).
+ *   3. Un set mínimo de tokens semánticos (muted/foreground/background/border)
+ *      para que los componentes se vean bien sin configurar shadcn.
+ *
+ * Requiere Tailwind v4 cargado aparte (para el resto de utilidades: flex, px-4,
+ * rounded-lg, etc.). Estas clases custom conviven con Tailwind.
+ * ========================================================================== */
+
+:root {
+  /* Paleta de marca (azul) — misma que el tema por defecto del dashboard */
+  --theme-50: hsl(214 100% 97%);
+  --theme-100: hsl(214 95% 93%);
+  --theme-150: hsl(214 93% 91%);
+  --theme-200: hsl(213 97% 87%);
+  --theme-300: hsl(212 96% 78%);
+  --theme-400: hsl(213 94% 68%);
+  --theme-500: hsl(217 91% 60%);
+  --theme-600: hsl(221 83% 53%);
+  --theme-700: hsl(224 76% 48%);
+  --theme-800: hsl(226 71% 40%);
+  --theme-900: hsl(224 64% 33%);
+  --theme-950: hsl(226 57% 21%);
+
+  /* Tokens semánticos (light) — para bg-muted, text-foreground, etc. */
+  --background: #ffffff;
+  --foreground: hsl(222 47% 11%);
+  --muted: hsl(210 40% 96%);
+  --muted-foreground: hsl(215 16% 47%);
+  --border: hsl(214 32% 91%);
+
+  /* Colores WhatsApp (referencia; en los componentes van como bg-[#...]) */
+  --wa-out: #d9fdd3;   /* burbuja saliente */
+  --wa-in: #ffffff;    /* burbuja entrante (sobre fondo del chat) */
+  --wa-chat-bg: #e5ddd5; /* fondo del panel de chat */
+  --wa-tick: #53bdeb;  /* checks azules (leído) */
+}
+
+/* --- Utilidades de marca (plain CSS, igual que hace el dashboard) --------- */
+.bg-theme-50  { background-color: var(--theme-50)  !important; }
+.bg-theme-100 { background-color: var(--theme-100) !important; }
+.bg-theme-150 { background-color: var(--theme-150) !important; }
+.bg-theme-200 { background-color: var(--theme-200) !important; }
+.bg-theme-300 { background-color: var(--theme-300) !important; }
+.bg-theme-400 { background-color: var(--theme-400) !important; }
+.bg-theme-500 { background-color: var(--theme-500) !important; }
+.bg-theme-600 { background-color: var(--theme-600) !important; }
+.bg-theme-700 { background-color: var(--theme-700) !important; }
+.bg-theme-900 { background-color: var(--theme-900) !important; }
+
+.text-theme-500 { color: var(--theme-500) !important; }
+.text-theme-600 { color: var(--theme-600) !important; }
+.text-theme-700 { color: var(--theme-700) !important; }
+.text-theme-800 { color: var(--theme-800) !important; }
+.text-theme-900 { color: var(--theme-900) !important; }
+
+.border-theme-200 { border-color: var(--theme-200) !important; }
+.border-theme-500 { border-color: var(--theme-500) !important; }
+
+/* --- Tokens semánticos como utilidades (para no depender de shadcn) ------- */
+.bg-background      { background-color: var(--background) !important; }
+.bg-muted           { background-color: var(--muted) !important; }
+.text-foreground    { color: var(--foreground) !important; }
+.text-muted-foreground { color: var(--muted-foreground) !important; }
+.border-default     { border-color: var(--border) !important; }

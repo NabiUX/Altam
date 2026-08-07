@@ -3,25 +3,41 @@ import {
   AbsoluteFill,
   interpolate,
   spring,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
 import { Theme } from "../theme";
 import { smoothSpring } from "../components/anim";
 
-// Cierre: wordmark de Altam + tagline + dominio.
-// Nota: es un logo tipográfico. Puedes reemplazarlo por el SVG real
-// dejándolo en /public y cargándolo con <Img>.
+// Isotipo real de Altam (public/LOGO.png). Se usa como máscara para poder
+// pintarlo con el color de acento de cada tema (visible en claro y oscuro).
+const LOGO = staticFile("LOGO.png");
+// Relación de aspecto del PNG original (1321×1068).
+const LOGO_RATIO = 1321 / 1068;
+const LOGO_H = 176;
+
+// Cierre: isotipo de Altam + wordmark + tagline + dominio.
 export const Closing: React.FC<{ theme: Theme }> = ({ theme }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const logo = spring({ frame: frame - 4, fps, config: smoothSpring });
+  const mark = spring({ frame: frame - 2, fps, config: smoothSpring });
+  const markBlur = interpolate(mark, [0, 1], [16, 0]);
+  const markY = interpolate(mark, [0, 1], [26, 0]);
+  const markScale = interpolate(mark, [0, 1], [0.92, 1]);
+
+  const logo = spring({ frame: frame - 14, fps, config: smoothSpring });
   const logoBlur = interpolate(logo, [0, 1], [14, 0]);
   const logoY = interpolate(logo, [0, 1], [24, 0]);
 
-  const tagline = spring({ frame: frame - 20, fps, config: smoothSpring });
-  const domain = spring({ frame: frame - 34, fps, config: smoothSpring });
+  const tagline = spring({ frame: frame - 28, fps, config: smoothSpring });
+  const domain = spring({ frame: frame - 42, fps, config: smoothSpring });
+
+  const markGlow =
+    theme.name === "dark"
+      ? ` drop-shadow(0 0 26px ${theme.accentGlow})`
+      : "";
 
   return (
     <AbsoluteFill
@@ -29,12 +45,31 @@ export const Closing: React.FC<{ theme: Theme }> = ({ theme }) => {
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
-        gap: 34,
+        gap: 30,
       }}
     >
       <div
         style={{
-          fontSize: 128,
+          width: LOGO_H * LOGO_RATIO,
+          height: LOGO_H,
+          backgroundColor: theme.accent,
+          WebkitMaskImage: `url(${LOGO})`,
+          maskImage: `url(${LOGO})`,
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskPosition: "center",
+          maskPosition: "center",
+          opacity: mark,
+          filter: `blur(${markBlur}px)${markGlow}`,
+          transform: `translateY(${markY}px) scale(${markScale})`,
+        }}
+      />
+
+      <div
+        style={{
+          fontSize: 116,
           fontWeight: 800,
           letterSpacing: "-0.04em",
           color: theme.text,

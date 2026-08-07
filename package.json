@@ -4,7 +4,7 @@
   "private": true,
   "description": "Animaciones estilo Apple para altam.io, renderizadas a video con Remotion",
   "scripts": {
-    "dev": "remotion studio",
+    "dev": "remotion studio --port=2200",
     "render": "remotion render AltamAd out/altam-ad-dark.mp4",
     "render:dark": "remotion render AltamAd out/altam-ad-dark.mp4",
     "render:light": "remotion render AltamAdLight out/altam-ad-light.mp4",
@@ -21,8 +21,10 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@remotion/tailwind-v4": "^4.0.506",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.8.3"
   }
 }
