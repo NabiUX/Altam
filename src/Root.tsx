@@ -25,11 +25,11 @@ export const RemotionRoot: React.FC = () => {
         {...common}
         defaultProps={{ theme: "light" as const }}
       />
-      {/* Anuncio del CRM (~60s) */}
+      {/* Anuncio del CRM (~66s) */}
       <Composition
         id="AltamCrmAd"
         component={AltamCrmAd}
-        durationInFrames={1800}
+        durationInFrames={1990}
         fps={30}
         width={1920}
         height={1080}

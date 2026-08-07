@@ -4,13 +4,14 @@ import { getTheme, ThemeName } from "./theme";
 import { fontFamily } from "./fonts";
 import { Background } from "./components/Background";
 import { ChaosInbox } from "./scenes/ChaosInbox";
+import { Manifesto } from "./scenes/Manifesto";
 import { BotSetup } from "./scenes/BotSetup";
 import { Conversation } from "./scenes/Conversation";
 import { Organized } from "./scenes/Organized";
 import { CrmClosing } from "./scenes/CrmClosing";
 
-// Anuncio del CRM de WhatsApp de Altam — ~60s (1800 frames).
-// 5 escenas encadenadas con leve solape para crossfades suaves.
+// Anuncio del CRM de WhatsApp de Altam — ~66s (1990 frames).
+// Escenas encadenadas con leve solape para crossfades suaves.
 export const AltamCrmAd: React.FC<{ theme: ThemeName }> = ({ theme }) => {
   const t = getTheme(theme);
   return (
@@ -22,23 +23,28 @@ export const AltamCrmAd: React.FC<{ theme: ThemeName }> = ({ theme }) => {
         <ChaosInbox theme={t} />
       </Sequence>
 
-      {/* 5–16s · Configuras el bot */}
-      <Sequence from={150} durationInFrames={340}>
+      {/* ~4.7–11.7s · Interludio: "Por eso creamos…" (relevo desde la Escena 1) */}
+      <Sequence from={140} durationInFrames={210}>
+        <Manifesto theme={t} />
+      </Sequence>
+
+      {/* 11.3–22s · Configuras el bot */}
+      <Sequence from={340} durationInFrames={340}>
         <BotSetup theme={t} />
       </Sequence>
 
-      {/* 16–40s · La conversación */}
-      <Sequence from={480} durationInFrames={730}>
+      {/* 22–46s · La conversación */}
+      <Sequence from={670} durationInFrames={730}>
         <Conversation theme={t} />
       </Sequence>
 
-      {/* 40–48s · Todo ordenado */}
-      <Sequence from={1200} durationInFrames={250}>
+      {/* 46–54s · Todo ordenado */}
+      <Sequence from={1390} durationInFrames={250}>
         <Organized theme={t} />
       </Sequence>
 
-      {/* 48–60s · Cierre */}
-      <Sequence from={1440} durationInFrames={360}>
+      {/* 54–66s · Cierre */}
+      <Sequence from={1630} durationInFrames={360}>
         <CrmClosing theme={t} />
       </Sequence>
     </AbsoluteFill>
