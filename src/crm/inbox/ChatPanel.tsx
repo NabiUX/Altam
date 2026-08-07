@@ -18,6 +18,8 @@ interface ChatPanelProps {
   messages: Message[];
   showEscalation?: boolean;
   escalation?: { text: string; seller?: string; time?: string };
+  /** Si se indica, el banner de escalamiento se intercala JUSTO tras este id de mensaje. */
+  escalationAfterId?: string;
   typing?: { align?: "left" | "right" } | null;
 }
 
@@ -26,6 +28,7 @@ export function ChatPanel({
   messages,
   showEscalation,
   escalation,
+  escalationAfterId,
   typing,
 }: ChatPanelProps) {
   return (
@@ -50,15 +53,21 @@ export function ChatPanel({
         className="flex flex-1 flex-col gap-2 overflow-y-auto px-6 py-4"
         style={{ backgroundColor: "#e5ddd5" }}
       >
-        {messages.map((m) =>
-          m.template ? (
-            <TemplateBubble key={m.id} message={m} />
-          ) : (
-            <MessageBubble key={m.id} message={m} />
-          )
-        )}
+        {messages.map((m) => (
+          <React.Fragment key={m.id}>
+            {m.template ? (
+              <TemplateBubble message={m} />
+            ) : (
+              <MessageBubble message={m} />
+            )}
+            {showEscalation && escalation && escalationAfterId === m.id && (
+              <EscalationChip text={escalation.text} seller={escalation.seller} time={escalation.time} />
+            )}
+          </React.Fragment>
+        ))}
 
-        {showEscalation && escalation && (
+        {/* fallback: si no se indicó escalationAfterId, va al final (comportamiento previo) */}
+        {showEscalation && escalation && !escalationAfterId && (
           <EscalationChip text={escalation.text} seller={escalation.seller} time={escalation.time} />
         )}
 

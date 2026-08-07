@@ -15,6 +15,7 @@ interface InboxScreenProps {
   messages: Message[];
   showEscalation?: boolean;
   escalation?: { text: string; seller?: string; time?: string };
+  escalationAfterId?: string;
   typing?: { align?: "left" | "right" } | null;
 }
 
@@ -25,6 +26,7 @@ export function InboxScreen({
   messages,
   showEscalation,
   escalation,
+  escalationAfterId,
   typing,
 }: InboxScreenProps) {
   return (
@@ -35,6 +37,7 @@ export function InboxScreen({
         messages={messages}
         showEscalation={showEscalation}
         escalation={escalation}
+        escalationAfterId={escalationAfterId}
         typing={typing}
       />
       <ContactPanel contact={contact} />
