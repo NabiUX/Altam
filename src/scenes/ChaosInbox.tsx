@@ -9,7 +9,7 @@ import {
   staticFile,
   useCurrentFrame,
 } from "remotion";
-import { Theme } from "../theme";
+import { Theme, floatingTextColor, floatingTextShadow } from "../theme";
 
 // --- Fotos subidas por la usuaria (public/avatars/) ---
 const AVATARS = [
@@ -67,17 +67,23 @@ const rand = (n: number) => {
   return x - Math.floor(x);
 };
 
-const BLUR_START = 80; // el fondo de mensajes empieza a desenfocarse
-const PHRASE_START = 82; // empieza a "tipearse" la frase en el centro
-const EXIT_START = 136; // salida: la frase hace amago de subir y desaparece
+const PHRASE_START = 6; // la frase entra casi de inmediato (hook)
+const ENTER_DUR = 9; // frames que tarda la frase en emerger (súper rápida)
+const BLUR_DUR = 40; // el desenfoque del fondo es más gradual (independiente)
+const BLUR_START = PHRASE_START; // el desenfoque del fondo avanza en paralelo a la entrada
+const EXIT_START = 50; // salida: la frase hace amago de subir y desaparece (hook muy ágil)
 const EXIT_DUR = 8; // más rápido
+// Fusión: el CAOS ya no se va con la frase; PERSISTE bajo la caja 3D del
+// manifiesto y solo se desvanece al final de la secuencia fusionada.
+const BG_FADE_START = 170;
+const BG_FADE_DUR = 20;
 
 // --- Sonidos (public/sounds/) ---
 // Los pops de todos los mensajes van HORNEADOS en una sola pista (pops.mp3)
 // para no renderizar decenas de <Audio> (causaban "Maximum update depth").
 const SND_POPS = staticFile("sounds/pops.mp3");
 const SND_WHIP = staticFile("sounds/whip.mp3");
-const SND_TYPE = staticFile("sounds/type_kbd.mp3");
+const SND_POP = staticFile("sounds/bubble_pop.mp3"); // pop al emerger la frase
 
 const BUBBLE_W = 560;
 
@@ -112,7 +118,7 @@ const CALM = Array.from({ length: 5 }).map((_, i) => {
 // se va), de modo que hay mucho movimiento pero POCOS mensajes a la vez.
 // Sigue apareciendo durante toda la frase (fondo desenfocado vivo).
 const BURST_START = 46;
-const BURST = Array.from({ length: 40 }).map((_, j) => {
+const BURST = Array.from({ length: 56 }).map((_, j) => {
   const k = j + 30;
   return {
     start: BURST_START + j * 2.4,
@@ -248,9 +254,6 @@ const Bubble: React.FC<{ theme: Theme; ev: (typeof EVENTS)[number] }> = ({
 };
 
 const LINES = ["¿Cuántas ventas", "se te escapan?"];
-const LEN1 = LINES[0].length;
-const TOTAL_CHARS = LINES[0].length + LINES[1].length;
-const CPS = 1.7; // caracteres por frame al tipear (entrada rápida)
 
 const Line: React.FC<{ theme: Theme; text: string; cursor: boolean }> = ({
   theme,
@@ -259,16 +262,16 @@ const Line: React.FC<{ theme: Theme; text: string; cursor: boolean }> = ({
 }) => (
   <div
     style={{
-      height: 112,
+      height: 156,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      fontSize: 96,
+      fontSize: 134,
       fontWeight: 800,
       letterSpacing: "-0.03em",
-      color: theme.text,
+      color: floatingTextColor(theme),
       lineHeight: 1,
-      textShadow: "0 10px 50px rgba(0,0,0,0.85)",
+      textShadow: floatingTextShadow(theme, "0 10px 50px rgba(0,0,0,0.85)"),
       whiteSpace: "pre",
     }}
   >
@@ -292,35 +295,32 @@ const Line: React.FC<{ theme: Theme; text: string; cursor: boolean }> = ({
 export const ChaosInbox: React.FC<{ theme: Theme }> = ({ theme }) => {
   const frame = useCurrentFrame();
 
-  // Fondo con nervio: glow rojizo tenue que late.
-  const pulse = 0.5 + 0.5 * Math.sin(frame / 9);
-
   // El fondo de mensajes se DESENFOCA (y oscurece un poco) para que la frase
   // se lea encima; los mensajes siguen apareciendo detrás.
-  const bgBlur = interpolate(frame, [BLUR_START, BLUR_START + 18], [0, 15], {
+  const bgBlur = interpolate(frame, [BLUR_START, BLUR_START + BLUR_DUR], [0, 15], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const bgDim = interpolate(frame, [BLUR_START, BLUR_START + 18], [1, 0.55], {
+  const bgDim = interpolate(frame, [BLUR_START, BLUR_START + BLUR_DUR], [1, 0.55], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const scrim = interpolate(frame, [BLUR_START, BLUR_START + 18], [0, 0.5], {
+  const scrim = interpolate(frame, [BLUR_START, BLUR_START + BLUR_DUR], [0, 0.5], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // Frase que se "tipea" desde el centro, carácter por carácter, con cursor.
-  const typed = Math.min(
-    TOTAL_CHARS,
-    Math.max(0, Math.floor((frame - PHRASE_START) * CPS)),
-  );
-  const vis1 = LINES[0].slice(0, Math.min(typed, LEN1));
-  const vis2 = typed > LEN1 ? LINES[1].slice(0, typed - LEN1) : "";
-  const doneTyping = typed >= TOTAL_CHARS;
-  // Cursor sólido mientras escribe y durante la pausa; desaparece al terminar.
-  const showCursor = frame >= PHRASE_START && frame < EXIT_START && !doneTyping;
-  const cursorOnLine1 = typed <= LEN1;
+  // La frase se DESPLIEGA desde el centro hacia los lados: siempre al frente y
+  // nítida, se abre horizontalmente (scaleX 0 → 1) desde el eje central.
+  const enterProg = interpolate(frame, [PHRASE_START, PHRASE_START + ENTER_DUR], [0, 1], {
+    easing: Easing.out(Easing.cubic),
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const enterScaleX = enterProg;
+  const enterOp = interpolate(enterProg, [0, 0.25], [0, 1], {
+    extrapolateRight: "clamp",
+  });
 
   // Salida: la frase hace un pequeño amago de SUBIR y enseguida desaparece.
   const lift = interpolate(frame, [EXIT_START, EXIT_START + EXIT_DUR], [0, 1], {
@@ -334,26 +334,35 @@ export const ChaosInbox: React.FC<{ theme: Theme }> = ({ theme }) => {
     extrapolateRight: "clamp",
   });
 
+  // El caos PERSISTE bajo la caja del manifiesto (fusión). NO se va con la frase;
+  // solo se desvanece al final de la secuencia para dar paso a lo siguiente.
+  const bgFade = interpolate(frame, [BG_FADE_START, BG_FADE_START + BG_FADE_DUR], [1, 0], {
+    easing: Easing.in(Easing.quad),
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
-      {/* Glow tenso que respira */}
+      {/* Mensajes de fondo: siguen apareciendo y se desenfocan al llegar la frase;
+          PERSISTEN vivos bajo la caja 3D y se desvanecen al final. */}
       <AbsoluteFill
         style={{
-          background: `radial-gradient(circle at 50% 45%, rgba(255,70,70,${0.08 + pulse * 0.09}) 0%, rgba(255,70,70,0) 55%)`,
+          filter: `blur(${bgBlur}px)`,
+          opacity: bgDim * bgFade,
         }}
-      />
-
-      {/* Mensajes de fondo: siguen apareciendo, se desenfocan al llegar la frase */}
-      <AbsoluteFill style={{ filter: `blur(${bgBlur}px)`, opacity: bgDim }}>
+      >
         {EVENTS.map((ev, i) => (
           <Bubble key={i} theme={theme} ev={ev} />
         ))}
       </AbsoluteFill>
 
-      {/* Scrim central para dar contraste a la frase */}
+      {/* Scrim central para dar contraste a la frase/caja. Persiste con el caos.
+          Oscuro en fondo oscuro; CLARO en fondo claro. */}
       <AbsoluteFill
         style={{
-          background: `radial-gradient(circle at 50% 50%, rgba(5,8,20,${scrim}) 0%, rgba(5,8,20,0) 60%)`,
+          background: `radial-gradient(circle at 50% 50%, rgba(${theme.name === "light" ? "255,255,255" : "5,8,20"},${scrim}) 0%, rgba(${theme.name === "light" ? "255,255,255" : "5,8,20"},0) 60%)`,
+          opacity: bgFade,
         }}
       />
 
@@ -365,12 +374,12 @@ export const ChaosInbox: React.FC<{ theme: Theme }> = ({ theme }) => {
             flexDirection: "column",
             alignItems: "center",
             transformOrigin: "center center",
-            transform: `translateY(${exitY}px)`,
-            opacity: exitOp,
+            transform: `translateY(${exitY}px) scaleX(${enterScaleX})`,
+            opacity: exitOp * enterOp,
           }}
         >
-          <Line theme={theme} text={vis1} cursor={showCursor && cursorOnLine1} />
-          <Line theme={theme} text={vis2} cursor={showCursor && !cursorOnLine1} />
+          <Line theme={theme} text={LINES[0]} cursor={false} />
+          <Line theme={theme} text={LINES[1]} cursor={false} />
         </div>
       </AbsoluteFill>
 
@@ -380,19 +389,19 @@ export const ChaosInbox: React.FC<{ theme: Theme }> = ({ theme }) => {
       <Audio
         src={SND_POPS}
         volume={(f) =>
-          interpolate(f, [72, 98], [0.9, 0.08], {
+          interpolate(f, [BLUR_START + BLUR_DUR - 30, BLUR_START + BLUR_DUR], [1.3, 0.16], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           })
         }
       />
-      {/* Tecleo mientras se escribe la frase */}
-      <Sequence from={PHRASE_START} durationInFrames={19}>
-        <Audio src={SND_TYPE} volume={0.8} />
+      {/* Pop justo en el arranque del despliegue (frase súper rápida) */}
+      <Sequence from={PHRASE_START} durationInFrames={20}>
+        <Audio src={SND_POP} volume={0.6} playbackRate={1.6} />
       </Sequence>
       {/* Whip cuando la frase sale (acelerado = más punzante) */}
       <Sequence from={EXIT_START} durationInFrames={20}>
-        <Audio src={SND_WHIP} volume={0.9} playbackRate={1.7} />
+        <Audio src={SND_WHIP} volume={1.3} playbackRate={1.7} />
       </Sequence>
     </AbsoluteFill>
   );

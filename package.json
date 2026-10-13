@@ -8,14 +8,15 @@
     "render": "remotion render AltamAd out/altam-ad-dark.mp4",
     "render:dark": "remotion render AltamAd out/altam-ad-dark.mp4",
     "render:light": "remotion render AltamAdLight out/altam-ad-light.mp4",
-    "render:crm": "remotion render AltamCrmAd out/altam-crm-ad-dark.mp4",
+    "render:crm": "remotion render AltamCrmAd out/altam-anuncio.mp4",
+    "render:crm:claro": "remotion render AltamCrmAdLight out/altam-anuncio-claro.mp4",
     "upgrade": "remotion upgrade"
   },
   "license": "UNLICENSED",
   "dependencies": {
     "@remotion/cli": "^4.0.506",
     "@remotion/google-fonts": "^4.0.506",
-    "lucide-react": "^1.29.0",
+    "lucide-react": "^0.577.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "remotion": "^4.0.506",

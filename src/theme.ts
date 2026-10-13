@@ -26,6 +26,20 @@ export interface Theme {
 // Azul de marca Altam.
 const ALTAM_BLUE = "#2E6BFF";
 
+// Color del texto sobre fondo CLARO (frases/títulos flotantes): azul de marca en
+// vez de negro. Se usa en la versión de fondo claro de todas las escenas.
+export const LIGHT_TEXT_ACCENT = "oklch(68.5% 0.169 237.323)";
+
+// Devuelve el color del texto flotante según el tema del fondo: blanco/normal en
+// oscuro, azul de marca en claro.
+export const floatingTextColor = (t: Theme): string =>
+  t.name === "light" ? LIGHT_TEXT_ACCENT : t.text;
+
+// Sombra del texto flotante: en claro NO lleva sombra oscura (ensucia); en oscuro
+// mantiene la sombra para separarlo del fondo.
+export const floatingTextShadow = (t: Theme, shadow: string): string =>
+  t.name === "light" ? "none" : shadow;
+
 const light: Theme = {
   name: "light",
   bgFrom: "#FFFFFF",
@@ -43,8 +57,8 @@ const light: Theme = {
 
 const dark: Theme = {
   name: "dark",
-  bgFrom: "#0A1633",
-  bgTo: "#05070F",
+  bgFrom: "#1B2E5C",
+  bgTo: "#0C1424",
   accentGlow: "rgba(77, 130, 255, 0.38)",
   glowOpacity: 1,
   text: "#FFFFFF",
